@@ -7,8 +7,4 @@ public class ElectricityEntity {
 	public boolean electricityConductor;
 	public boolean electricityConsumer;
 	public boolean electricityProducer;
-	
-	public void scan(Class c){
-		
-	}
 }

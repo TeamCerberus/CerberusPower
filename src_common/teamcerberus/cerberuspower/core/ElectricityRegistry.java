@@ -2,6 +2,10 @@ package teamcerberus.cerberuspower.core;
 
 import java.util.HashMap;
 
+import teamcerberus.cerberuspower.api.IElectricityConductor;
+import teamcerberus.cerberuspower.api.IElectricityConsumer;
+import teamcerberus.cerberuspower.api.IElectricityProducer;
+
 import net.minecraft.world.World;
 
 public class ElectricityRegistry {
@@ -11,6 +15,7 @@ public class ElectricityRegistry {
 
 	public ElectricityRegistry() {
 		electricityNetworks = new HashMap<World, ElectricityNetwork>();
+		electricityEntities = new HashMap<Class<? extends IElectricityTile>, ElectricityEntity>();
 	}
 
 	public ElectricityNetwork getInstanceForWorld(World world) {
@@ -20,10 +25,25 @@ public class ElectricityRegistry {
 	}
 	
 	public void registerElectricityTile(Class<? extends IElectricityTile> class_){
-		
+		ElectricityEntity entity = new ElectricityEntity();
+		entity.electricityAcceptor = IElectricityAcceptor.class.isAssignableFrom(class_);
+		entity.electricityConductor = IElectricityConductor.class.isAssignableFrom(class_);
+		entity.electricityConsumer = IElectricityConsumer.class.isAssignableFrom(class_);
+		entity.electricityEmitter = IElectricityEmitter.class.isAssignableFrom(class_);
+		entity.electricityProducer = IElectricityProducer.class.isAssignableFrom(class_);
+		entity.electricityTile = IElectricityTile.class.isAssignableFrom(class_);
+		electricityEntities.put(class_, entity);
 	}
-
-	public ElectricityRegistry getInstance() {
+	
+	public ElectricityEntity getElectricityEntity(Class<?> class_){
+		return electricityEntities.get(class_);
+	}
+	
+	public boolean isEntityRegistured(Class<?> class_){
+		return electricityEntities.containsKey(class_);
+	}
+	
+	public static ElectricityRegistry getInstance() {
 		if (instance == null) instance = new ElectricityRegistry();
 		return instance;
 	}
