@@ -112,9 +112,9 @@ public class ElectricityNetwork {
 				.get(energySource)) {
 			assert getRegistry().getElectricityEntity(energySource.getClass()).electricityConsumer;
 
-			IElectricityConsumer energySink = (IElectricityConsumer) energyPath.target;
+			IElectricityConsumer energyConsumer = (IElectricityConsumer) energyPath.target;
 
-			if (energySink.electricityWanted() > 0 && energyPath.loss < amount) {
+			if (energyConsumer.electricityWanted() > 0 && energyPath.loss < amount) {
 				totalInvLoss += 1.0D / energyPath.loss;
 				activeEnergyPaths.add(energyPath);
 			}
@@ -139,7 +139,7 @@ public class ElectricityNetwork {
 			activeEnergyPaths.clear();
 
 			for (EnergyPath energyPath : currentActiveEnergyPaths) {
-				IElectricityConsumer energySink = (IElectricityConsumer) energyPath.target;
+				IElectricityConsumer energyConsumer = (IElectricityConsumer) energyPath.target;
 
 				int energyProvided = (int) Math
 						.floor(Math.round(amount / totalInvLoss
@@ -147,12 +147,12 @@ public class ElectricityNetwork {
 				int energyLoss = (int) Math.floor(energyPath.loss);
 
 				if (energyProvided > energyLoss) {
-					int energyReturned = energySink.giveElectricity(
+					int energyReturned = energyConsumer.giveElectricity(
 							energyPath.targetDirection, energyProvided
 									- energyLoss);
 
 					if (energyReturned == 0
-							&& energySink.electricityWanted() > 0) {
+							&& energyConsumer.electricityWanted() > 0) {
 						activeEnergyPaths.add(energyPath);
 						newTotalInvLoss += 1.0D / energyPath.loss;
 					} else if (energyReturned >= energyProvided - energyLoss) {
