@@ -24,9 +24,7 @@ public class ElectricityNetwork {
 	public void addTileEntity(TileEntity addedTileEntity) {
 		if (!getRegistry().isEntityRegistured(addedTileEntity.getClass())
 				|| ((IElectricityTile) addedTileEntity)
-						.isAddedToElectricityNetwork()) {
-			return;
-		}
+						.isAddedToElectricityNetwork()) { return; }
 
 		if (getRegistry().getElectricityEntity(addedTileEntity.getClass()).electricityAcceptor) {
 			LinkedList<EnergyPath> reverseEnergyPaths = discover(

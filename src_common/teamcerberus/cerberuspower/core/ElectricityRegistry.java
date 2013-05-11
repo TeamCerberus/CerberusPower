@@ -20,8 +20,7 @@ public class ElectricityRegistry {
 
 	public ElectricityNetwork getInstanceForWorld(World world) {
 		if (!electricityNetworks.containsKey(world)) {
-			electricityNetworks.put(
-					world, new ElectricityNetwork());
+			electricityNetworks.put(world, new ElectricityNetwork());
 		}
 		return electricityNetworks.get(world);
 	}
