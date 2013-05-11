@@ -4,9 +4,9 @@ import teamcerberus.cerberuspower.util.ElectricityDirection;
 
 public class EnergyBlockLink {
 	public ElectricityDirection	direction;
-	public double				loss;
+	public float				loss;
 
-	public EnergyBlockLink(ElectricityDirection direction, double loss) {
+	public EnergyBlockLink(ElectricityDirection direction, float loss) {
 		this.direction = direction;
 		this.loss = loss;
 	}

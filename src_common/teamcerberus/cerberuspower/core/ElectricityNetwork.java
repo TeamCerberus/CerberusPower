@@ -15,18 +15,19 @@ import teamcerberus.cerberuspower.api.IElectricityProducer;
 import teamcerberus.cerberuspower.util.ElectricityDirection;
 
 public class ElectricityNetwork {
-	private HashMap<IElectricityProducer, LinkedList<EnergyPath>> energySourceToEnergyPathMap = new HashMap<IElectricityProducer, LinkedList<EnergyPath>>();
+	private HashMap<IElectricityProducer, LinkedList<EnergyPath>>	energySourceToEnergyPathMap	= new HashMap<IElectricityProducer, LinkedList<EnergyPath>>();
 
 	public ElectricityRegistry getRegistry() {
 		return ElectricityRegistry.getInstance();
 	}
 
 	public void addTileEntity(TileEntity addedTileEntity) {
-		if ((!getRegistry().isEntityRegistured(addedTileEntity.getClass()))
+		if (!getRegistry().isEntityRegistured(addedTileEntity.getClass())
 				|| ((IElectricityTile) addedTileEntity)
-						.isAddedToElectricityNetwork())
+						.isAddedToElectricityNetwork()) {
 			return;
-		
+		}
+
 		if (getRegistry().getElectricityEntity(addedTileEntity.getClass()).electricityAcceptor) {
 			LinkedList<EnergyPath> reverseEnergyPaths = discover(
 					addedTileEntity, true, 2147483647);
@@ -43,7 +44,7 @@ public class ElectricityNetwork {
 	}
 
 	public void removeTileEntity(TileEntity removedTileEntity) {
-		if ((!getRegistry().isEntityRegistured(removedTileEntity.getClass()))
+		if (!getRegistry().isEntityRegistured(removedTileEntity.getClass())
 				|| !((IElectricityTile) removedTileEntity)
 						.isAddedToElectricityNetwork()) {
 			boolean alreadyRemoved = !((IElectricityTile) removedTileEntity)
@@ -64,7 +65,8 @@ public class ElectricityNetwork {
 				IElectricityProducer energySource = (IElectricityProducer) reverseEnergyPath.target;
 				if (energySourceToEnergyPathMap.containsKey(energySource)
 						&& energySource.getElectricityOutputLimit() > reverseEnergyPath.loss) {
-					if (getRegistry().getElectricityEntity(removedTileEntity.getClass()).electricityConductor) {
+					if (getRegistry().getElectricityEntity(
+							removedTileEntity.getClass()).electricityConductor) {
 						energySourceToEnergyPathMap.remove(energySource);
 					} else {
 						for (Iterator<EnergyPath> it = energySourceToEnergyPathMap
@@ -85,11 +87,12 @@ public class ElectricityNetwork {
 
 	@SuppressWarnings("unchecked")
 	public int produceElectricity(TileEntity te, int amount) {
-		if(!getRegistry().isEntityRegistured(te.getClass())){
-			CerberusLogger.logSevere("Electricity tile must be register! Tile: "+te);
+		if (!getRegistry().isEntityRegistured(te.getClass())) {
+			CerberusLogger
+					.logSevere("Electricity tile must be register! Tile: " + te);
 			return 0;
 		}
-		
+
 		IElectricityProducer energySource = (IElectricityProducer) te;
 		if (!energySource.isAddedToElectricityNetwork()) {
 			CerberusLogger.logSevere("Electricity tile: " + energySource
@@ -105,7 +108,7 @@ public class ElectricityNetwork {
 		}
 
 		LinkedList<EnergyPath> activeEnergyPaths = new LinkedList<EnergyPath>();
-		double totalInvLoss = 0.0D;
+		float totalInvLoss = 0.0F;
 
 		for (EnergyPath energyPath : energySourceToEnergyPathMap
 				.get(energySource)) {
@@ -131,7 +134,7 @@ public class ElectricityNetwork {
 
 		while (!activeEnergyPaths.isEmpty() && amount > 0) {
 			int energyConsumed = 0;
-			double newTotalInvLoss = 0.0D;
+			float newTotalInvLoss = 0.0F;
 
 			LinkedList<EnergyPath> currentActiveEnergyPaths = (LinkedList<EnergyPath>) activeEnergyPaths
 					.clone();
@@ -204,11 +207,11 @@ public class ElectricityNetwork {
 		LinkedList<TileEntity> tileEntitiesToCheck = new LinkedList<TileEntity>();
 
 		tileEntitiesToCheck.add(emitter);
-		double currentLoss;
+		float currentLoss;
 		while (!tileEntitiesToCheck.isEmpty()) {
 			TileEntity currentTileEntity = tileEntitiesToCheck.remove();
 			if (!currentTileEntity.isInvalid()) {
-				currentLoss = 0.0D;
+				currentLoss = 0.0F;
 
 				if (currentTileEntity != emitter) {
 					currentLoss = reachedTileEntities.get(currentTileEntity).loss;
@@ -219,17 +222,14 @@ public class ElectricityNetwork {
 
 				for (EnergyTarget validReceiver : validReceivers) {
 					if (validReceiver.tileEntity != emitter) {
-						double additionalLoss = 0.0D;
-						if (getRegistry().getElectricityEntity(validReceiver.tileEntity.getClass()).electricityConductor) {
+						float additionalLoss = 0.0F;
+						if (getRegistry().getElectricityEntity(
+								validReceiver.tileEntity.getClass()).electricityConductor) {
 							additionalLoss = ((IElectricityConductor) validReceiver.tileEntity)
-									.getConductionLoss();
-
-							if (additionalLoss < 0.0001D) {
-								additionalLoss = 0.0001D;
-							}
+									.getElectricityLoss();
 
 							if (currentLoss + additionalLoss >= lossLimit) {
-								;
+								break;
 							}
 						} else if (!reachedTileEntities
 								.containsKey(validReceiver.tileEntity)
@@ -241,7 +241,8 @@ public class ElectricityNetwork {
 											validReceiver.direction,
 											currentLoss + additionalLoss));
 
-							if (getRegistry().getElectricityEntity(validReceiver.tileEntity.getClass()).electricityConductor) {
+							if (getRegistry().getElectricityEntity(
+									validReceiver.tileEntity.getClass()).electricityConductor) {
 								tileEntitiesToCheck
 										.remove(validReceiver.tileEntity);
 								tileEntitiesToCheck
@@ -262,8 +263,12 @@ public class ElectricityNetwork {
 			}
 			TileEntity tileEntity = entry.getKey();
 
-			if (!reverse && getRegistry().getElectricityEntity(tileEntity.getClass()).electricityConsumer
-					|| reverse && getRegistry().getElectricityEntity(tileEntity.getClass()).electricityProducer) {
+			if (!reverse
+					&& getRegistry()
+							.getElectricityEntity(tileEntity.getClass()).electricityConsumer
+					|| reverse
+					&& getRegistry()
+							.getElectricityEntity(tileEntity.getClass()).electricityProducer) {
 				EnergyBlockLink energyBlockLink = entry.getValue();
 
 				EnergyPath energyPath = new EnergyPath();
@@ -272,7 +277,9 @@ public class ElectricityNetwork {
 				energyPath.target = tileEntity;
 				energyPath.targetDirection = energyBlockLink.direction;
 
-				if (!reverse && getRegistry().getElectricityEntity(emitter.getClass()).electricityProducer) {
+				if (!reverse
+						&& getRegistry().getElectricityEntity(
+								emitter.getClass()).electricityProducer) {
 					while (true) {
 						tileEntity = energyBlockLink.direction
 								.applyToTileEntity(tileEntity);
@@ -281,7 +288,8 @@ public class ElectricityNetwork {
 							fullBreak = true;
 							break;
 						}
-						if (!(getRegistry().getElectricityEntity(tileEntity.getClass()).electricityConductor)) {
+						if (!getRegistry().getElectricityEntity(
+								tileEntity.getClass()).electricityConductor) {
 							break;
 						}
 						IElectricityConductor energyConductor = (IElectricityConductor) tileEntity;
@@ -340,20 +348,24 @@ public class ElectricityNetwork {
 				ElectricityDirection inverseDirection = direction.getInverse();
 
 				if (!reverse
-						&& getRegistry().getElectricityEntity(emitter.getClass()).electricityEmitter
+						&& getRegistry().getElectricityEntity(
+								emitter.getClass()).electricityEmitter
 						&& ((IElectricityEmitter) emitter).emitsEnergyTo(
 								target, direction)
 						|| reverse
-						&& getRegistry().getElectricityEntity(emitter.getClass()).electricityAcceptor
+						&& getRegistry().getElectricityEntity(
+								emitter.getClass()).electricityAcceptor
 						&& ((IElectricityAcceptor) emitter).acceptsEnergyFrom(
 								target, direction)) {
 					if (!reverse
-							&& getRegistry().getElectricityEntity(target.getClass()).electricityAcceptor
+							&& getRegistry().getElectricityEntity(
+									target.getClass()).electricityAcceptor
 							&& ((IElectricityAcceptor) target)
 									.acceptsEnergyFrom(emitter,
 											inverseDirection)
 							|| reverse
-							&& getRegistry().getElectricityEntity(target.getClass()).electricityEmitter
+							&& getRegistry().getElectricityEntity(
+									target.getClass()).electricityEmitter
 							&& ((IElectricityEmitter) target).emitsEnergyTo(
 									emitter, inverseDirection)) {
 						validReceivers.add(new EnergyTarget(target,

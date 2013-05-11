@@ -30,9 +30,7 @@ public enum ElectricityDirection {
 		int inverseDir = dir - getSign();
 
 		for (ElectricityDirection direction : directions) {
-			if (direction.dir == inverseDir) {
-				return direction;
-			}
+			if (direction.dir == inverseDir) { return direction; }
 		}
 
 		return this;
