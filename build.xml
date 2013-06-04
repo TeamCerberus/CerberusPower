@@ -42,6 +42,7 @@
     <target name="build" depends="setup-workdir">
         <delete file="VERSION" />
         <delete dir="${mcp.bin}" />
+        
         <echo>Building ${modname}.</echo>
         <unzip src="${forge.jar.built}" dest="${mcp.bin}">
             <patternset><exclude name="MANIFEST.MF" /></patternset>
@@ -108,7 +109,6 @@
         <delete dir="${temp.dir}" />
         <copy todir="${temp.src}">
             <fileset dir="${mod.src}" />
-            <fileset dir="${mod.src_client}" />
         </copy>
         <replace dir="${temp.src}" token="@VERSION@" value="${version}" />
         <replace dir="${temp.src}" token="@BUILD_NUMBER@" value="${build_number.build_number}" />
@@ -122,8 +122,7 @@
         <property name="modname" value="CerberusPower" />
 
         <property name="mod.base" location="${basedir}" />
-        <property name="mod.src" location="${mod.base}/src_common" />
-        <property name="mod.src_client" location="${mod.base}/src_client" />
+        <property name="mod.src" location="${mod.base}/src" />
         <property name="mod.bin" location="${mod.base}/bin" />
 
         <property name="temp.dir" location= "${mod.base}/tmp" />
@@ -149,7 +148,7 @@
         <condition property="version.build" value="${env.BUILD_NUMBER}" else="dev">
             <isset property="env.BUILD_NUMBER" />
         </condition>
-        <property file="${mod.base}/version.properties" />
+        <property file="${mod.src}/version.properties" />
         <property name="build.version" value="${mod.build.major.number}.${mod.build.minor.number}.${mod.build.revision.number}" />
         <property name="version.minecraft" value="${build.mcversion}" />
         <property name="version.major" value="${build.major.number}" />
@@ -160,6 +159,7 @@
             <isset property="release" />
         </condition>
         <property name="minecraft.version" value="${build.mcversion}" />
+
         <property name="forge.version" value="${build.forgeversion}" />
         
         <property name="mod.jar.release" location="${mod.base}/${modname}-universal-${minecraft.version}-${version}-Forge-${build.forgeversion}.jar" />
@@ -203,6 +203,7 @@
 	<target name="build-jenkins" depends="setup-workdir">
         <delete file="VERSION" />
         <delete dir="${mcp.bin}" />
+        
         <echo>Building ${modname}.</echo>
         <unzip src="${forge.jar.built}" dest="${mcp.bin}">
             <patternset><exclude name="MANIFEST.MF" /></patternset>

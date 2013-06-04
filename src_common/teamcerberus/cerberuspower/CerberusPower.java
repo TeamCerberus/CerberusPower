@@ -2,6 +2,7 @@ package teamcerberus.cerberuspower;
 
 import net.minecraftforge.common.Configuration;
 import teamcerberus.cerberuscore.config.ConfigurationParser;
+import teamcerberus.cerberuspower.core.ElectricityRegistry;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.Init;
 import cpw.mods.fml.common.Mod.PreInit;
@@ -21,6 +22,7 @@ public class CerberusPower {
 	public void preinit(FMLPreInitializationEvent e) {
 		ConfigurationParser.Parse(this,
 				new Configuration(e.getSuggestedConfigurationFile()));
+		ElectricityRegistry.getInstance();
 	}
 
 	@Init
