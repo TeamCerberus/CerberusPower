@@ -180,9 +180,10 @@
                 <exclude name="**/*.java"/>
                 <exclude name="com/" />
             </fileset>
+			<!--
             <mappedresources>
                 <concat>
-                    <!-- <fileset dir="${mod.src}" includes="mcmod.info" /> -->
+                    <fileset dir="${mod.src}" includes="mcmod.info" /> 
                     <filterchain>
                         <replacetokens>
                             <token key="NAME" value="${modname}" />
@@ -193,6 +194,7 @@
                 </concat>
                 <mergemapper to="mcmod.info" />
             </mappedresources>
+			-->
         </jar>
         <echo file="VERSION">${minecraft.version} -- v${version}</echo>
     </target>
