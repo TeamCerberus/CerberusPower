@@ -39,76 +39,12 @@
             <fileset dir="${mcp.bin}" includes="**/*.class" />
         </jar>
     </target>
-    <target name="build" depends="setup-workdir">
-        <delete file="VERSION" />
-        <delete dir="${mcp.bin}" />
-        
-        <echo>Building ${modname}.</echo>
-        <unzip src="${forge.jar.built}" dest="${mcp.bin}">
-            <patternset><exclude name="MANIFEST.MF" /></patternset>
-        </unzip>
-        <javac  encoding="UTF-8" compiler="modern" source="1.6" target="1.6" deprecation="false"
-                destdir="${mcp.bin}" includeantruntime="false" includejavaruntime="true" debug="true">
-            <compilerarg value="-Xlint:-options" />
-            <compilerarg value="-Xlint:deprecation" />
-            <compilerarg value="-Xlint:unchecked" />
-            <classpath>
-                <pathelement location="${mod.base}\minecraftforge-built.jar" />
-                <pathelement location="${mcp.lib}\argo-3.2-src.jar" />
-                <pathelement location="${mcp.lib}\asm-debug-all-4.1.jar" />
-                <pathelement location="${mcp.lib}\bcprov-debug-jdk15on-148.jar" />
-                <pathelement location="${mcp.lib}\guava-14.0-rc3.jar" />
-                <pathelement location="${mcp.jars}\bin\minecraft.jar" />
-                <pathelement location="${mcp.jars}\bin\jinput.jar" />
-                <pathelement location="${mcp.jars}\bin\lwjgl.jar" />
-                <pathelement location="${mcp.jars}\bin\lwjgl_util.jar" />
-                <pathelement location="${mcp.jars}\bin\minecraft.jar" />
-            </classpath>
-            <src path="${temp.src}" />
-        </javac>
-    </target>
 	
-    <target name="reobfuscate" depends="build">
-        <unzip src="${forge.jar.built}" dest="${mcp.bin}" />
-        <echo message="Reobfuscating ${modname}." level="info" />
-        <exec executable="${python.exe}" dir="${mcp.base}" failonerror="true">
-            <arg value="${mcp.base}/runtime/reobfuscate.py" />
-            <arg value="--srgnames" />
-        </exec>
-        <echo message="Building a release jar." />
-        <jar destfile="${mod.jar.release}">
-            <fileset dir="${mcp.reobf}" includes="cazzar/" />
-            <fileset dir="${mod.src}">
-                <exclude name="mcmod.info"/>
-                <exclude name="**/*.java"/>
-                <exclude name="com/" />
-            </fileset>
-            <fileset dir="${mod.base}/resources">
-                <exclude name="mcmod.info"/>
-                <exclude name="**/*.java"/>
-                <exclude name="com/" />
-            </fileset>
-            <mappedresources>
-                <concat>
-                    <fileset dir="${mod.src}" includes="mcmod.info" />
-                    <filterchain>
-                        <replacetokens>
-                            <token key="NAME" value="${modname}" />
-                            <token key="VERSION" value="${version}" />
-                            <token key="MCVERSION" value="${mcversion}" />
-                        </replacetokens>
-                    </filterchain>
-                </concat>
-                <mergemapper to="mcmod.info" />
-            </mappedresources>
-        </jar>
-        <echo file="VERSION">${minecraft.version} -- v${version}</echo>
-    </target>
-    
     <target name="setup-workdir" depends="build-forge">
         <delete dir="${temp.dir}" />
         <copy todir="${temp.src}">
-            <fileset dir="${mod.src}" />
+            <fileset dir="${mod.src.client}" />
+			<fileset dir="${mod.src.common}" />
         </copy>
         <replace dir="${temp.src}" token="@VERSION@" value="${version}" />
         <replace dir="${temp.src}" token="@BUILD_NUMBER@" value="${build_number.build_number}" />
@@ -122,7 +58,8 @@
         <property name="modname" value="CerberusPower" />
 
         <property name="mod.base" location="${basedir}" />
-        <property name="mod.src" location="${mod.base}/src" />
+        <property name="mod.src.common" location="${mod.base}/src_common" />
+		<property name="mod.src.client" location="${mod.base}/src_client" />
         <property name="mod.bin" location="${mod.base}/bin" />
 
         <property name="temp.dir" location= "${mod.base}/tmp" />
@@ -138,8 +75,6 @@
         <property name="mcp.jars" location="${mcp.base}/jars" />
         <property name="mcp.lib" location="${mcp.base}/lib" />
         <property name="mcp.reobf" location="${mcp.base}/reobf/minecraft" />
-
-        <property name="bon.jar" location="${env.BON_HOME}/bon.jar" />
 
         <condition property="python.exe" value="${forge.base}/fml/python/python_fml" else="python">
             <os family="Windows" />
@@ -189,16 +124,6 @@
 		
 		<property file="build_number.properties" prefix="build_number"/>
     </target>
-    <target name="release">
-		<property name="release" value="true" />
-		<!--Increase the release number in the config-->
-		<propertyfile file="build_number.properties">
-			<entry key="build_number" type="int" operation="+" default="1"/>
-		</propertyfile>
-		
-        <antcall target="setupvars" />
-        <antcall target="reobfuscate" />
-    </target>
 	
 	<target name="build-jenkins" depends="setup-workdir">
         <delete file="VERSION" />
@@ -239,8 +164,13 @@
         </exec>
         <echo message="Building a release jar." />
         <jar destfile="${mod.jar.release}">
-            <fileset dir="${mcp.reobf}" includes="cazzar/" />
-            <fileset dir="${mod.src}">
+            <fileset dir="${mcp.reobf}" />
+            <fileset dir="${mod.src.client}">
+                <exclude name="mcmod.info"/>
+                <exclude name="**/*.java"/>
+                <exclude name="com/" />
+            </fileset>
+			<fileset dir="${mod.src.common}">
                 <exclude name="mcmod.info"/>
                 <exclude name="**/*.java"/>
                 <exclude name="com/" />
@@ -252,7 +182,7 @@
             </fileset>
             <mappedresources>
                 <concat>
-                    <fileset dir="${mod.src}" includes="mcmod.info" />
+                    <!-- <fileset dir="${mod.src}" includes="mcmod.info" /> -->
                     <filterchain>
                         <replacetokens>
                             <token key="NAME" value="${modname}" />
