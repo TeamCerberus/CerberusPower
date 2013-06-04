@@ -165,7 +165,7 @@
         <echo message="Building a release jar." />
         <jar destfile="${mod.jar.release}">
             <fileset dir="${mcp.reobf}" />
-            <fileset dir="${mod.src.client}">
+            <fileset dir="${mod.src.client}" failonerror="false">
                 <exclude name="mcmod.info"/>
                 <exclude name="**/*.java"/>
                 <exclude name="com/" />
