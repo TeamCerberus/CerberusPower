@@ -148,7 +148,7 @@
         <condition property="version.build" value="${env.BUILD_NUMBER}" else="dev">
             <isset property="env.BUILD_NUMBER" />
         </condition>
-        <property file="${mod.src}/version.properties" />
+        <property file="version.properties" />
         <property name="build.version" value="${mod.build.major.number}.${mod.build.minor.number}.${mod.build.revision.number}" />
         <property name="version.minecraft" value="${build.mcversion}" />
         <property name="version.major" value="${build.major.number}" />
