@@ -165,11 +165,11 @@
         <echo message="Building a release jar." />
         <jar destfile="${mod.jar.release}">
             <fileset dir="${mcp.reobf}" />
-            <fileset dir="${mod.src.client}" failonerror="false">
+            <!--<fileset dir="${mod.src.client}">
                 <exclude name="mcmod.info"/>
                 <exclude name="**/*.java"/>
                 <exclude name="com/" />
-            </fileset>
+            </fileset>-->
 			<fileset dir="${mod.src.common}">
                 <exclude name="mcmod.info"/>
                 <exclude name="**/*.java"/>
