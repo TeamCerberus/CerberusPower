@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="CerberusPower" default="reobfuscate">
+<project name="CerberusPower" default="reobfuscate-jenkins">
     <target name="download-forge" depends="setupvars" unless="forge.downloaded">
         <echo>Downloading Minecraft Forge...</echo>
         <delete dir="${forge.base}" />
@@ -42,9 +42,9 @@
 	
     <target name="setup-workdir" depends="build-forge">
         <delete dir="${temp.dir}" />
-        <copy todir="${temp.src}">
-            <fileset dir="${mod.src.client}" />
+        <copy todir="${temp.src}" failonerror="false">
 			<fileset dir="${mod.src.common}" />
+			<fileset dir="${mod.src.client}" />
         </copy>
         <replace dir="${temp.src}" token="@VERSION@" value="${version}" />
         <replace dir="${temp.src}" token="@BUILD_NUMBER@" value="${build_number.build_number}" />
